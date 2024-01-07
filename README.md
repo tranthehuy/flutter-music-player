@@ -1,9 +1,11 @@
-# play_music
+# Play Music Flutter Project 
 
-Play Music
+Application Name: Beo Play Music
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+![screenshot-app](documents/Screenshot-2.png)
 
-![screenshot-app](documents/Screenshot-1.png)
+For the first time, please install dependencies
+
+`flutter pub get`
