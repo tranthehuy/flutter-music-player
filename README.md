@@ -9,3 +9,7 @@ Application Name: Beo Play Music
 For the first time, please install dependencies
 
 `flutter pub get`
+
+## Run on a physical device
+
+`flutter run --release`
