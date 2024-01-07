@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class Config {
-  String name;
+  String lastFile;
+  bool repeat;
 
-  Config(this.name);
+  Config(this.lastFile, this.repeat);
 
   Map<String, dynamic> toJson() => {
-    'name': name
+    'lastFile': lastFile,
+    'repeat': repeat
   };
 
   static Future<String> getLocalPath() async {
@@ -27,7 +29,7 @@ class Config {
       final file = File(await getLocalPath());
       final contents = await file.readAsString();
       final json = jsonDecode(contents);
-      return Config(json['name']);
+      return Config(json['lastFile'], json['repeat']);
     } catch(e) {
       return null;
     }

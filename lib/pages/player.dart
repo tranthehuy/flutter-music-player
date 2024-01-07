@@ -17,6 +17,7 @@ class _PlayerState extends State<Player> {
   PlatformFile? file;
   String? filePath;
   String fileName = '';
+  bool repeat = false;
   AudioPlayer? audioPlayer;
 
   int length = 0;
@@ -25,7 +26,7 @@ class _PlayerState extends State<Player> {
   @override
   void initState() {
     super.initState();
-    loadFilePath();
+    loadSettings();
     audioPlayer = AudioPlayer();
     audioPlayer!.onPlayerStateChanged.listen((PlayerState s) => {
           setState(() {
@@ -48,7 +49,15 @@ class _PlayerState extends State<Player> {
     audioPlayer!.play(DeviceFileSource(filePath));
   }
 
-  void loadFilePath() async {
+  void updateLoop() {
+    if (repeat && (audioPlayer != null)) {
+      audioPlayer!.setReleaseMode(ReleaseMode.loop);
+    } else {
+      audioPlayer!.setReleaseMode(ReleaseMode.release);
+    }
+  }
+
+  void loadSettings() async {
     await Fluttertoast.showToast(
         msg: "Load app config...",
         toastLength: Toast.LENGTH_SHORT,
@@ -61,15 +70,17 @@ class _PlayerState extends State<Player> {
 
     setState(() {
       if (c != null) {
-        filePath = c.name;
-        fileName = c.name.split('/').last;
-        print(c.name);
+        filePath = c.lastFile;
+        fileName = c.lastFile.split('/').last;
+        repeat = c.repeat;
+        updateLoop();
+        print(c.lastFile);
       }
     });
   }
 
-  Future<void> saveFilePath(String newFilePath) async {
-    final c = Config(newFilePath);
+  Future<void> saveSettings(String newFilePath, bool repeat) async {
+    final c = Config(newFilePath, repeat);
     await Config.saveConfig(c);
   }
 
@@ -79,7 +90,7 @@ class _PlayerState extends State<Player> {
 
     String newFilePath = selected!.path ?? '';
 
-    await saveFilePath(newFilePath);
+    await saveSettings(newFilePath, repeat);
 
     setState(() {
       file = selected!;
@@ -107,9 +118,9 @@ class _PlayerState extends State<Player> {
                     fixedSize: MaterialStateProperty.all(Size(70, 70)),
                   ),
                   onPressed: () {
-                    loadFilePath();
+                    loadSettings();
                   },
-                  child: Icon(Icons.refresh)),
+                  child: Icon(Icons.settings)),
               ElevatedButton(
                   style: ButtonStyle(
                     foregroundColor:
@@ -122,6 +133,23 @@ class _PlayerState extends State<Player> {
                     openFile();
                   },
                   child: Icon(Icons.file_open)),
+              ElevatedButton(
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    backgroundColor: repeat
+                        ? MaterialStateProperty.all<Color>(Colors.orange)
+                        : MaterialStateProperty.all<Color>(Colors.white12),
+                    fixedSize: MaterialStateProperty.all(Size(70, 70)),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      repeat = !repeat;
+                      saveSettings(filePath!, repeat);
+                      updateLoop();
+                    });
+                  },
+                  child: Icon(Icons.repeat)),
             ],
           ),
         ),
