@@ -154,7 +154,7 @@ class _PlayerState extends State<Player> {
           ),
         ),
         Container(
-          color: Colors.white12,
+          color: Colors.white54,
           child: Padding(
               padding: EdgeInsets.fromLTRB(10, 100, 10, 100),
               child:
@@ -163,7 +163,7 @@ class _PlayerState extends State<Player> {
                     child: Text(
                   fileName,
                   style:
-                      TextStyle(fontSize: 24, color: Colors.lightGreenAccent),
+                      TextStyle(fontSize: 24, color: Colors.black),
                 ))
               ])),
         ),
