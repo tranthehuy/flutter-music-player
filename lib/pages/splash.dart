@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void startApp() {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
           builder: (context) => MyHomePage(title: 'Music Player')),

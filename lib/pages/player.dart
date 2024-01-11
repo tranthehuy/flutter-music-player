@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:play_music/components/settings.dart';
 import 'package:play_music/utils/configs.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,22 +28,7 @@ class _PlayerState extends State<Player> {
   void initState() {
     super.initState();
     loadSettings();
-    audioPlayer = AudioPlayer();
-    audioPlayer!.onPlayerStateChanged.listen((PlayerState s) => {
-          setState(() {
-            mode = s;
-          })
-        });
-    audioPlayer!.onDurationChanged.listen((Duration d) => {
-          setState(() {
-            length = d.inSeconds;
-          })
-        });
-    audioPlayer!.onPositionChanged.listen((Duration p) => {
-          setState(() {
-            current = p.inSeconds;
-          })
-        });
+    setAudioHandlers();
   }
 
   Future<void> playAudio(String filePath) async {
@@ -55,6 +41,25 @@ class _PlayerState extends State<Player> {
     } else {
       audioPlayer!.setReleaseMode(ReleaseMode.release);
     }
+  }
+
+  void setAudioHandlers() {
+    audioPlayer = AudioPlayer();
+    audioPlayer!.onPlayerStateChanged.listen((PlayerState s) => {
+      setState(() {
+        mode = s;
+      })
+    });
+    audioPlayer!.onDurationChanged.listen((Duration d) => {
+      setState(() {
+        length = d.inSeconds;
+      })
+    });
+    audioPlayer!.onPositionChanged.listen((Duration p) => {
+      setState(() {
+        current = p.inSeconds;
+      })
+    });
   }
 
   void loadSettings() async {
@@ -79,8 +84,8 @@ class _PlayerState extends State<Player> {
     });
   }
 
-  Future<void> saveSettings(String newFilePath, bool repeat) async {
-    final c = Config(newFilePath, repeat);
+  Future<void> saveSettings() async {
+    final c = Config(filePath ?? '', repeat);
     await Config.saveConfig(c);
   }
 
@@ -88,15 +93,13 @@ class _PlayerState extends State<Player> {
     final selected = await FileHandler.chooseFile();
     if (selected == null) return;
 
-    String newFilePath = selected!.path ?? '';
-
-    await saveSettings(newFilePath, repeat);
-
     setState(() {
       file = selected!;
       final str = selected!.path ?? '';
       filePath = str;
       fileName = str.split('/').last;
+
+      saveSettings();
     });
   }
 
@@ -118,6 +121,8 @@ class _PlayerState extends State<Player> {
                     fixedSize: MaterialStateProperty.all(Size(70, 70)),
                   ),
                   onPressed: () {
+                    final dialog = SettingsDialog(context);
+                    dialog.show();
                     loadSettings();
                   },
                   child: Icon(Icons.settings)),
@@ -145,7 +150,7 @@ class _PlayerState extends State<Player> {
                   onPressed: () {
                     setState(() {
                       repeat = !repeat;
-                      saveSettings(filePath!, repeat);
+                      saveSettings();
                       updateLoop();
                     });
                   },
